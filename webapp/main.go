@@ -22,8 +22,8 @@ func main() {
 func index(w http.ResponseWriter, r *http.Request) {
 	produtos := []Produto{
 		{Nome: "Camiseta", Descricao: "Azul bem bonita", Preco: 39, Quantidade: 5},
-		{"Tenis", "Confortavel como eu sempre quis", 89, 3},
-		{"Fone", "Muito bom de bonito", 59, 2},
+		{"Tenis", "Confortavel", 89, 3},
+		{"Fone", "Muito bom ", 59, 2},
 		{"Produto novo", "Muito bom mesmo", 1.99, 1},
 	}
 
