@@ -16,6 +16,7 @@ func conectaComBancoDeDados() *sql.DB {
 }
 
 type Produto struct {
+	id 		   int
 	Nome       string
 	Descricao  string
 	Preco      float64
@@ -25,20 +26,40 @@ type Produto struct {
 var temp = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
-	db := conectaComBancoDeDados()
-	defer db.Close()
 	http.HandleFunc("/", index)
 	http.ListenAndServe(":8000", nil)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	produtos := []Produto{
-		{Nome: "Camiseta", Descricao: "Azul bem bonita", Preco: 39, Quantidade: 5},
-		{"Tenis", "Confortavel", 89, 3},
-		{"Fone", "Muito bom ", 59, 2},
-		{"Produto novo", "Muito bom mesmo", 1.99, 1},
+	db := conectaComBancoDeDados()
+
+	selectDeTodosOsProdutos, err := db.Query("select * from produtos")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	p := Produto{}
+	produtos := []Produto{}
+
+	for selectDeTodosOsProdutos.Next(){
+		var id, quantidade int
+		var nome, descricao string
+		var preco float64
+
+		err = selectDeTodosOsProdutos.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		p.Nome = nome
+		p.Descricao = descricao
+		p.Preco = preco
+		p.Quantidade = quantidade
+
+		produtos = append(produtos, p)
 	}
 
 	temp.ExecuteTemplate(w, "index", produtos)
+	defer db.Close()
 
 }
